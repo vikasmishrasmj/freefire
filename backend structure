@@ -1,0 +1,59 @@
+-freefire/
+│ │ │ ├─ entryController.js
+│ │ │ ├─ matchController.js
+│ │ │ ├─ resultController.js
+│ │ │ └─ payoutController.js
+│ │ ├─ services/
+│ │ │ ├─ paymentService.js
+│ │ │ ├─ payoutService.js
+│ │ │ ├─ notificationService.js
+│ │ │ └─ antiCheatService.js
+│ │ ├─ models/
+│ │ │ ├─ User.js
+│ │ │ ├─ Tournament.js
+│ │ │ ├─ Entry.js
+│ │ │ ├─ Match.js
+│ │ │ ├─ Result.js
+│ │ │ └─ Payout.js
+│ │ ├─ routes/
+│ │ │ ├─ authRoutes.js
+│ │ │ ├─ userRoutes.js
+│ │ │ ├─ tournamentRoutes.js
+│ │ │ ├─ entryRoutes.js
+│ │ │ ├─ matchRoutes.js
+│ │ │ ├─ resultRoutes.js
+│ │ │ └─ webhookRoutes.js
+│ │ ├─ middlewares/
+│ │ │ ├─ auth.js
+│ │ │ ├─ roleCheck.js
+│ │ │ └─ validateRequest.js
+│ │ ├─ utils/
+│ │ │ ├─ logger.js
+│ │ │ ├─ errorHandler.js
+│ │ │ └─ s3.js
+│ │ ├─ jobs/
+│ │ │ └─ payoutJob.js
+│ │ ├─ socket/
+│ │ │ └─ lobbySocket.js
+│ │ ├─ config/
+│ │ │ └─ index.js
+│ │ └─ server.js
+│ ├─ Dockerfile
+│ └─ package.json
+├─ frontend/
+│ ├─ src/
+│ │ ├─ components/
+│ │ ├─ pages/
+│ │ │ ├─ Login.jsx
+│ │ │ ├─ Dashboard.jsx
+│ │ │ ├─ Tournament.jsx
+│ │ │ ├─ MatchLobby.jsx
+│ │ │ └─ AdminPanel.jsx
+│ │ ├─ services/api.js
+│ │ └─ App.jsx
+│ ├─ Dockerfile
+│ └─ package.json
+├─ infra/
+│ ├─ k8s/ (optional)
+│ └─ nginx.conf
+└─ README.md

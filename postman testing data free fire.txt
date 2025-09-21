@@ -1,0 +1,155 @@
+
+
+                               jayant 
+                               id -
+     
+
+                                    {
+    "_id": "68bacdfade53f42c33ca54a3",
+    "username": "jaynt",
+    "email": "jayant@example.com",
+    "freefireId": "FF12346",
+    "role": "player",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YmFjZGZhZGU1M2Y0MmMzM2NhNTRhMyIsInJvbGUiOiJwbGF5ZXIiLCJpYXQiOjE3NTc2NjcyNTgsImV4cCI6MTc1ODI3MjA1OH0.Wmq-qJ2xb7Wxzu9r-1YoKFbyvaUVvim6cWc4UDQMKqQ"
+} 
+
+
+
+                                                     vikas
+                                                      id - 
+
+                                                    {
+    "_id": "68bab13232a53818a0152718",
+    "username": "vikas",
+    "email": "vikas@example.com",
+    "freefireId": "FF12345",
+    "role": "player",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YmFiMTMyMzJhNTM4MThhMDE1MjcxOCIsInJvbGUiOiJwbGF5ZXIiLCJpYXQiOjE3NTc2NjcyNjcsImV4cCI6MTc1ODI3MjA2N30.JGXk1Yf2BRwEPQ7pZ0JtRyc7sv3qWntAK9mS3ghEzUU"
+}
+
+
+
+                                                                    dheeraj
+                                                                    id -  
+
+
+
+                                                                  {
+    "_id": "68bad031de53f42c33ca54ba",
+    "username": "dheeraj",
+    "email": "dheeraj@example.com",
+    "freefireId": "FF12348",
+    "role": "player",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YmFkMDMxZGU1M2Y0MmMzM2NhNTRiYSIsInJvbGUiOiJwbGF5ZXIiLCJpYXQiOjE3NTc2NjcyNzIsImV4cCI6MTc1ODI3MjA3Mn0.h3r8Yh400wXhSnv9Bo9cu00ra81xcuhU2Q-oZSz4358"
+} 
+
+
+
+
+
+                                                              tournamnet__ id
+             
+
+                                                               {
+    "success": true,
+    "message": "Tournament created successfully",
+    "data": {
+        "title": "new match of free fire",
+        "game": "Free Fire",
+        "entryFee": 99999,
+        "prize": 99990,
+        "maxPlayers": 30,
+        "registeredPlayers": [],
+        "status": "upcoming",
+        "startTime": "2025-09-06T18:00:00.000Z",
+        "createdBy": "68bacdfade53f42c33ca54a3",
+        "_id": "68c3ecf63f65a2a91ca034ad",
+        "createdAt": "2025-09-12T09:50:46.782Z",
+        "updatedAt": "2025-09-12T09:50:46.782Z",
+        "__v": 0
+    }
+}
+
+
+
+                                                             join tournament and Match__id 
+
+
+
+                                                                    {
+    "success": true,
+    "message": "Joined tournament successfully & scheduled automatically",
+    "data": {
+        "entry": {
+            "tournament": "68c3ecf63f65a2a91ca034ad",
+            "player": "68bad031de53f42c33ca54ba",
+            "paymentStatus": "completed",
+            "_id": "68c3eda83f65a2a91ca034c3",
+            "createdAt": "2025-09-12T09:53:44.553Z",
+            "updatedAt": "2025-09-12T09:53:44.553Z",
+            "__v": 0
+        },
+        "match": {
+            "result": {
+                "topPlayers": []
+            },
+            "_id": "68c3ed113f65a2a91ca034b6",
+            "tournament": "68c3ecf63f65a2a91ca034ad",
+            "title": "new match of free fire - Match 1",
+            "mode": "squad",
+            "scheduledTime": "2025-09-06T18:00:00.000Z",
+            "players": [
+                "68bacdfade53f42c33ca54a3",
+                "68bab13232a53818a0152718",
+                "68bad031de53f42c33ca54ba"
+            ],
+            "status": "upcoming",
+            "createdAt": "2025-09-12T09:51:13.615Z",
+            "updatedAt": "2025-09-12T09:53:44.677Z",
+            "__v": 2
+        }
+    }
+} 
+
+
+                                                     get Scheduled match and join menbers with id nad their name 
+
+
+
+                                                                 {
+    "success": true,
+    "data": [
+        {
+            "result": {
+                "topPlayers": []
+            },
+            "_id": "68c3ed113f65a2a91ca034b6",
+            "tournament": "68c3ecf63f65a2a91ca034ad",
+            "title": "new match of free fire - Match 1",
+            "mode": "squad",
+            "scheduledTime": "2025-09-06T18:00:00.000Z",
+            "players": [
+                {
+                    "_id": "68bacdfade53f42c33ca54a3",
+                    "username": "jaynt",
+                    "freefireId": "FF12346"
+                },
+                {
+                    "_id": "68bab13232a53818a0152718",
+                    "username": "vikas",
+                    "freefireId": "FF12345"
+                },
+                {
+                    "_id": "68bad031de53f42c33ca54ba",
+                    "username": "dheeraj",
+                    "freefireId": "FF12348"
+                }
+            ],
+            "status": "upcoming",
+            "createdAt": "2025-09-12T09:51:13.615Z",
+            "updatedAt": "2025-09-12T09:53:44.677Z",
+            "__v": 2
+        }
+    ]
+}
+                             

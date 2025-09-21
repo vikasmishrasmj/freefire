@@ -1,0 +1,57 @@
+Frontend File Tree Structure (React + Vite/CRA)
+
+frontend/
+│── public/
+│    └── index.html             # Root HTML file
+│
+│── src/
+│    │── main.jsx               # Entry point, wraps App with BrowserRouter + Context
+│    │── App.jsx                # Main app with routes
+│    │── index.css              # Global CSS
+│
+│    ├── assets/                # Images, icons, logos
+│    │    └── logo.png
+│
+│    ├── api/                   # API service files (Axios calls)
+│    │    ├── axiosConfig.js    # Base axios instance with token setup
+│    │    ├── authApi.js        # Auth related API (login, signup)
+│    │    ├── contestApi.js     # Contest related API (create, join, list)
+│    │    ├── paymentApi.js     # Payment related API (Razorpay integration)
+│    │    └── userApi.js        # User profile, history
+│
+│    ├── context/               # Global state management (React Context + useReducer)
+│    │    ├── AuthContext.jsx   # Stores logged-in user, token
+│    │    ├── ContestContext.jsx# Stores contest list, joined contests
+│    │    └── PaymentContext.jsx# Stores payment status / history
+│
+│    ├── components/            # Reusable UI components
+│    │    ├── Navbar.jsx        # Top navigation bar
+│    │    ├── Footer.jsx        # Footer
+│    │    ├── ProtectedRoute.jsx# PrivateRoute for authenticated pages
+│    │    ├── ContestCard.jsx   # Contest info card (entry fee, prize, slots)
+│    │    ├── PaymentButton.jsx # Razorpay checkout button
+│    │    └── Loader.jsx        # Loading spinner
+│
+│    ├── pages/                 # Full pages
+│    │    ├── Home.jsx          # Landing page with contests list
+│    │    ├── Login.jsx         # Login form
+│    │    ├── Signup.jsx        # Signup form
+│    │    ├── Dashboard.jsx     # User dashboard (my contests, payments, winnings)
+│    │    ├── ContestDetails.jsx# Contest details & join button
+│    │    ├── PaymentSuccess.jsx# After payment success
+│    │    ├── PaymentFailed.jsx # After payment failure
+│    │    ├── Profile.jsx       # User profile & settings
+│    │    └── AdminPanel.jsx    # (Optional) Admin page for managing contests
+│
+│    ├── utils/                 # Helper functions
+│    │    ├── validators.js     # Form validation (email, password, etc.)
+│    │    ├── formatDate.js     # Format dates
+│    │    └── authHelper.js     # Save/remove token in localStorage
+│
+│    └── styles/                # CSS files for pages/components
+│         ├── Home.css
+│         ├── Login.css
+│         ├── Dashboard.css
+│         └── ContestDetails.css
+│
+└── package.json

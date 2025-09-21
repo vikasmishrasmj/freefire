@@ -1,0 +1,214 @@
+/* MyMatchPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.matches-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.matches-page h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 15px;
+  opacity: 0;
+  animation: fadeIn 0.8s forwards 0.3s;
+}
+
+.matches-page h1:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 2px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.matches-page > p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  animation: pulse 1.5s infinite;
+}
+
+/* Match cards grid */
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.match-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardAppear 0.6s forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.match-card:nth-child(1) { animation-delay: 0.1s; }
+.match-card:nth-child(2) { animation-delay: 0.2s; }
+.match-card:nth-child(3) { animation-delay: 0.3s; }
+.match-card:nth-child(4) { animation-delay: 0.4s; }
+.match-card:nth-child(5) { animation-delay: 0.5s; }
+
+.match-card:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3498db, #2ecc71);
+  transition: width 0.3s ease;
+}
+
+.match-card:hover:before {
+  width: 8px;
+}
+
+.match-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.match-card p {
+  margin: 12px 0;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.match-card strong {
+  color: #34495e;
+  font-weight: 600;
+}
+
+/* Status badges */
+.match-card p:nth-child(2) {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.status-completed {
+  background-color: #e7f7ef;
+  color: #27ae60;
+}
+
+.status-ongoing {
+  background-color: #ebf5fb;
+  color: #2980b9;
+  animation: pulse 2s infinite;
+}
+
+.status-upcoming {
+  background-color: #fef9e7;
+  color: #f39c12;
+}
+
+/* Winner highlight */
+.match-card p:last-child {
+  color: #27ae60;
+  font-weight: 600;
+  padding: 8px 12px;
+  background-color: #e7f7ef;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+/* Empty state */
+.matches-page > p:last-child {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin-top: 40px;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 1s forwards;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .matches-page {
+    padding: 15px;
+  }
+  
+  .matches-page h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .matches-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .match-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .matches-page h1 {
+    font-size: 1.8rem;
+  }
+  
+  .match-card p {
+    font-size: 0.9rem;
+  }
+}

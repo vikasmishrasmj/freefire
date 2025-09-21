@@ -1,0 +1,18 @@
+.matches-page {
+  padding: 20px;
+  text-align: center;
+}
+
+.match-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px auto;
+  width: 300px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.match-card p {
+  margin: 5px 0;
+}

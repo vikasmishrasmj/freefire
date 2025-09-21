@@ -1,0 +1,133 @@
+Great — chalo frontend + Redux + admin panel ko asaan, step-by-step way me shuru karte hain.
+Main pehle complete file tree aur backend ke endpoints ke saath mapping doonga, phir chhote milestones me kaun-kaunse files pehle banani hain aur unke ready-to-copy code snippets dunga (taaki aap turant paste karke run kar sako).
+
+Tone simple Hindi + English — chhote steps rakhe hain jisse aap ek-ek karke implement kar sako.
+
+1) Recommended frontend project structure (tree)
+frontend/
+├─ package.json
+├─ vite.config.js
+├─ public/
+│  └─ index.html
+├─ src/
+│  ├─ main.jsx
+│  ├─ App.jsx
+│  ├─ index.css
+│  ├─ services/
+│  │  ├─ api.js                // axios instance (all backend calls)
+│  │  └─ socket.js             // socket.io-client connection helper
+│  ├─ store/
+│  │  ├─ store.js
+│  │  └─ rootReducer.js       // optional aggregator
+│  ├─ features/
+│  │  ├─ auth/
+│  │  │  ├─ authSlice.js
+│  │  │  └─ authAPI.js        // optional thin wrapper
+│  │  ├─ tournaments/
+│  │  │  ├─ tournamentsSlice.js
+│  │  │  └─ tournamentsAPI.js
+│  │  ├─ matches/
+│  │  │  ├─ matchesSlice.js
+│  │  │  └─ matchesAPI.js
+│  │  └─ leaderboard/
+│  │     ├─ leaderboardSlice.js
+│  │     └─ leaderboardAPI.js
+│  ├─ pages/
+│  │  ├─ Login.jsx
+│  │  ├─ Register.jsx
+│  │  ├─ Dashboard.jsx         // user dashboard / tournament list
+│  │  ├─ Tournament.jsx        // single tournament view + join
+│  │  ├─ MatchLobby.jsx
+│  │  └─ AdminPanel/
+│  │     ├─ AdminPanel.jsx
+│  │     ├─ ManageTournaments.jsx
+│  │     └─ Payouts.jsx
+│  ├─ components/
+│  │  ├─ ProtectedRoute.jsx
+│  │  ├─ Header.jsx
+│  │  ├─ TournamentCard.jsx
+│  │  └─ Pagination.jsx
+│  └─ utils/
+│     ├─ helpers.js
+│     └─ constants.js
+└─ README.md
+
+2) Kaun se frontend files backend ke kis endpoint/feature se connect karenge (mapping)
+
+services/api.js — base axios instance; sab requests yahi se jayengi.
+
+features/auth/authSlice.js — /api/auth/register, /api/auth/login (save token, user).
+
+features/tournaments/tournamentsAPI.js & tournamentsSlice.js
+
+POST /api/tournaments/create (create)
+
+GET /api/tournaments (list)
+
+GET /api/tournaments/:id (detail)
+
+POST /api/tournaments/join (join)
+
+GET /api/tournaments/:id/matches (tournament matches)
+
+features/matches/matchesAPI.js & matchesSlice.js
+
+POST /api/matches/create
+
+GET /api/matches/:tournamentId
+
+PUT /api/matches/result/:matchId
+
+features/leaderboard/leaderboardAPI.js
+
+GET /api/leaderboard/:tournamentId
+
+PUT /api/leaderboard/:tournamentId/:playerId (manual admin update)
+
+services/socket.js — connect to socket server; listen for matchCreated, matchUpdated, matchResultUpdated, leaderboardUpdated, leaderboardManuallyUpdated.
+
+AdminPanel pages call manual leaderboard update route, payout routes later.
+
+3) Dependencies & project init (Milestone 0)
+
+Terminal commands (from frontend/ folder):
+
+Create vite app (recommended):
+
+npm create vite@latest frontend -- --template react
+cd frontend
+
+
+Install libs:
+
+npm install axios react-router-dom@6 @reduxjs/toolkit react-redux socket.io-client
+
+
+(Optionally: tailwind / chakra / material UI if you want CSS frameworks)
+
+Dev:
+
+npm run dev
+
+4) Milestones (small steps) — each step with files to create & short code
+Milestone 1 — Auth + app bootstrap (must do first)
+
+Goal: run app, get Login/Register working, store token in Redux/localStorage.
+
+Files to add/create now (copy-paste code I give):
+
+src/main.jsx
+
+src/App.jsx
+
+src/services/api.js
+
+src/store/store.js
+
+src/features/auth/authSlice.js
+
+src/pages/Login.jsx
+
+src/pages/Register.jsx
+
+src/components/ProtectedRoute.jsx

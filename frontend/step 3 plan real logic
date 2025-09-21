@@ -1,0 +1,113 @@
+1️⃣ Real-world Free Fire Tournament Flow
+
+Tournament Listing Page
+
+User dekh sakta hai saare tournaments: title, prize, entry fee, start time, max players, status.
+
+Status: Upcoming / Ongoing / Completed
+
+Join Tournament / Registration
+
+Agar tournament free hai → User directly join kar sakta hai
+
+Agar tournament paid hai → User ko payment karna padega
+
+Payment ke baad entry confirm hoti hai
+
+Payment Page
+
+Entry fee show hota hai
+
+Payment gateways use hote hain (Google Pay, Paytm, Stripe, Razorpay, etc.)
+
+Payment successful → backend me Entry record create hoti hai, wallet balance update hota hai
+
+Tournament Detail Page / My Matches
+
+User dekh sakta hai:
+
+Registered players / teams
+
+Scheduled matches
+
+Match result / leaderboard (after matches complete)
+
+2️⃣ Conceptual Flow for Your Web App
+
+Tournament Page
+
+Already tumhare paas hai: list of tournaments + join button
+
+Join Tournament → Payment Page
+
+Jab user “Join” click kare:
+
+Check karo entryFee
+
+If > 0 → redirect to PaymentPage
+
+If 0 → direct join, show “Successfully joined”
+
+Payment Page
+
+Show: tournament details + entry fee
+
+Payment button → deduct from wallet (tumhara wallet API use karke)
+
+Payment successful → Entry record create ho → redirect to MyMatchesPage
+
+My Matches Page / Tournament Detail
+
+Show: matches, opponents, match schedule
+
+Agar tournament ongoing → upcoming matches show
+
+Agar completed → results + leaderboard show
+
+3️⃣ Backend Requirements
+
+Join Tournament API
+
+Already hai
+
+Update: check if entryFee > 0 → wait for payment
+
+Payment success → mark entry as confirmed
+
+Payment API
+
+Endpoint: /api/wallet/pay
+
+Body: { tournamentId, userId, amount }
+
+Logic:
+
+Check wallet balance
+
+Deduct amount
+
+Confirm tournament entry
+
+My Matches API
+
+Endpoint: /api/matches/my
+
+Returns: tournamentId, match schedule, opponents, result (if available)
+
+4️⃣ Frontend Pages Needed
+
+TournamentPage.jsx → List all tournaments + join button
+
+PaymentPage.jsx → Payment + confirm join
+
+MyMatchesPage.jsx → Show matches for user
+
+💡 UX Tip:
+
+Join button → Payment modal / page
+
+Payment success → Toast / alert + redirect to MyMatches
+
+Wallet deduction + tournament entry should be atomic (either both succeed or fail)
+
+Agar chaho to mai abhi PaymentPage.jsx + API logic + redirect after join ka complete working code tumhare frontend-backend ke saath bana du, jise tum direct copy-paste kar sako.

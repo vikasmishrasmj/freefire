@@ -1,0 +1,102 @@
+🛠 Roadmap: Backend + Frontend Connection
+1. Auth System (Register & Login)
+
+Backend:
+
+/api/auth/register → user create karo
+
+/api/auth/login → token generate karo (JWT)
+
+authMiddleware → protected routes ke liye
+
+Frontend Pages:
+
+Register.jsx → form → API call /api/auth/register
+
+Login.jsx → form → API call /api/auth/login → token Redux store me save
+
+👉 Start yahin se kyunki bina login/register ke baaki pages ka access nahi milega.
+
+2. User Profile
+
+Backend:
+
+/api/users/me → current user data return (protected route)
+
+/api/users/:id → specific user profile
+
+Frontend Page:
+
+Profile.jsx → API call /api/users/me → profile data show
+
+3. Tournaments
+
+Backend:
+
+/api/tournaments (GET) → all tournaments list
+
+/api/tournaments (POST) → create new tournament (admin only)
+
+/api/tournaments/:id → single tournament details
+
+Frontend Page:
+
+Tournaments.jsx → fetch tournaments list, show cards/table
+
+(Later add: create/join button → POST API call)
+
+4. Matches
+
+Backend:
+
+/api/matches (GET) → list all matches
+
+/api/matches (POST) → create match (admin/organizer)
+
+/api/matches/:id → match details
+
+Frontend Page:
+
+Matches.jsx → show upcoming/past matches
+
+Add "Join Match" logic later
+
+5. Leaderboard
+
+Backend:
+
+/api/leaderboard (GET) → players list sorted by score
+
+Update score when match ends (logic backend me)
+
+Frontend Page:
+
+Leaderboard.jsx → fetch leaderboard data and render table
+
+6. Dashboard/HomePage
+
+Backend: Nahi, ye mainly frontend routing + aggregation page hai
+
+Frontend Page:
+
+Dashboard.jsx → ek layout banega jo Navbar + nested routes (Tournaments, Matches, Leaderboard, Profile) ko hold karega
+
+🔑 Suggestion: Kis Page se Start Kare?
+
+Step 1 → Register + Login (Auth complete karo)
+
+bina iske koi bhi protected API call nahi chalegi.
+
+Step 2 → Profile (check karna easy ho jayega ki auth kaam kar raha hai ki nahi)
+
+Step 3 → Tournaments (sabse bada feature, list + join/create logic)
+
+Step 4 → Matches (tournaments ke baad natural flow hai)
+
+Step 5 → Leaderboard (match/tournament ke results ke basis pe update hoga)
+
+Step 6 → Dashboard (sab ko integrate karna)
+
+👉 Matlab tumhe pehle Auth + Profile integrate karna chahiye, uske baad Tournaments → Matches → Leaderboard flow me aage badhna. Styling ke baad mai dekh lenge.
+
+Kya tum chahte ho mai tumhare liye pehle step (Auth integration: Register/Login frontend se backend connect) ka working flow code example bana du taaki tum direct implement karke test kar sako?

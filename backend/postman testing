@@ -1,0 +1,570 @@
+Assumptions (aapke current code ke hisaab se)
+
+Auth endpoints: POST /api/auth/register, POST /api/auth/login
+
+Tournament endpoints: POST /api/tournaments/create, POST /api/tournaments/join, GET /api/tournaments/:id/matches
+
+Match endpoints: POST /api/matches/create (optional/manual), GET /api/matches/:tournamentId, PUT /api/matches/result/:matchId
+
+Leaderboard endpoints: GET /api/leaderboard/:tournamentId and GET /api/leaderboard/:tournamentId/me
+
+All protected routes require header: Authorization: Bearer <token>
+
+0) Quick sanity: ensure server & routes running
+
+npm run dev → console shows server and Mongo connected.
+
+Confirm server.js mounts routes: /api/auth, /api/tournaments, /api/matches, /api/leaderboard.
+
+1) Create 3 test users (Register) — do this in Postman
+
+Endpoint:
+
+POST http://localhost:5000/api/auth/register
+Headers: Content-Type: application/json
+Body (JSON):
+{
+  "username":"userA",
+  "email":"a@example.com",
+  "password":"123456",
+  "phone":"9000000001",
+  "freefireId":"FF_A"
+}
+
+
+Repeat for userB / userC with different emails & freefireId.
+
+Expected: 201 with JSON containing _id and token.
+Action: Save each user's _id and token (we’ll use tokens for protected calls).
+
+2) Login each user (optional if token from register already valid)
+
+Endpoint:
+
+POST http://localhost:5000/api/auth/login
+Body:
+{ "email":"a@example.com", "password":"123456" }
+
+
+Expected: response with token. Save tokens: TOKEN_A, TOKEN_B, TOKEN_C.
+
+3) Create a Tournament (use one user as creator, e.g. userA)
+
+Endpoint:
+
+POST http://localhost:5000/api/tournaments/create
+Headers:
+  Authorization: Bearer TOKEN_A
+  Content-Type: application/json
+Body:
+{
+  "title": "Free Fire Quick Cup",
+  "entryFee": 10,
+  "prize": 100,
+  "maxPlayers": 70,
+  "startTime": "2025-09-15T12:00:00.000Z"
+}
+
+
+Expected: 201 with data._id — save TOURNAMENT_ID.
+
+4) (Optional) If you want to pre-create a match manually — skip if you want pure auto-scheduling
+
+Manual create:
+
+POST http://localhost:5000/api/matches/create
+Headers: Authorization: Bearer TOKEN_A
+Body:
+{
+  "tournamentId": "TOURNAMENT_ID",
+  "title": "Match 1",
+  "mode": "squad",
+  "scheduledTime": "2025-09-15T12:05:00.000Z"
+}
+
+
+If you skip this, first user who joins will auto-create the match.
+
+5) Each user JOIN the tournament (this triggers auto-scheduling)
+
+For user A:
+
+POST http://localhost:5000/api/tournaments/join
+Headers: Authorization: Bearer TOKEN_A
+Body: { "tournamentId": "TOURNAMENT_ID" }
+
+
+Repeat for user B and user C, with their tokens.
+
+Expected (for each join):
+
+success: true
+
+data.entry — entry document
+
+data.match — the match object (created on first join or updated).
+Check data.match.players contains the joining user's id.
+
+Note: On first join match will be created and players = [userA]. On second join match.players should become [userA, userB], etc.
+
+6) Verify matches list (ensure all joined players are present)
+
+Endpoint:
+
+GET http://localhost:5000/api/matches/TOURNAMENT_ID
+Headers: Authorization: Bearer TOKEN_A (or any valid token)
+
+
+Expected: data array with match(es). For the automatic flow, one match with players containing userA, userB, userC.
+
+If not all players appear:
+
+Check join responses: each join returned match — inspect that returned match.players.
+
+If some join responses had players missing, ensure the join route you hit was the correct POST /api/tournaments/join with proper token.
+
+If still missing, check server logs for errors.
+
+7) Pick a matchId to update result
+
+From the GET matches response pick " _id": "<MATCH_ID>". Save MATCH_ID.
+
+8) Update match result → this should update Leaderboard
+
+Important: use a token of a user allowed to update (tournament creator or admin). If your middleware doesn't enforce roles, any logged-in user token will work.
+
+Endpoint:
+
+PUT http://localhost:5000/api/matches/result/MATCH_ID
+Headers:
+  Authorization: Bearer TOKEN_ADMIN_OR_CREATOR
+  Content-Type: application/json
+Body:
+{
+  "winner": "PLAYER_A_ID",
+  "topPlayers": ["PLAYER_A_ID", "PLAYER_B_ID"],
+  "status": "completed"
+}
+
+
+What code does:
+
+match.result = { winner, topPlayers }, status updated
+
+then updateLeaderboard(match.tournament, match.result) runs:
+
+Winner: +10 points, wins +1
+
+Each topPlayer: kills +1, points +5
+
+If winner is also in topPlayers, they get both => total +15 and wins +1 and kills +1.
+
+Expected: 200 with updated match (status completed, result object).
+
+9) Check Leaderboard (tournament-level)
+GET http://localhost:5000/api/leaderboard/TOURNAMENT_ID
+Headers: Authorization: Bearer TOKEN_A
+
+
+Expected: array sorted by points/wins/kills. Example after one result:
+
+[
+  { "player": { "_id":"PLAYER_A_ID", "username":"userA" }, "kills":1, "points":15, "wins":1 },
+  { "player": { "_id":"PLAYER_B_ID", "username":"userB" }, "kills":1, "points":5, "wins":0 },
+  // others maybe 0
+]
+
+10) Check “My Performance”
+
+Use TOKEN_B for example:
+
+GET http://localhost:5000/api/leaderboard/TOURNAMENT_ID/me
+Headers: Authorization: Bearer TOKEN_B
+
+
+Expected: performance object for that user (kills, points, wins). If user not in leaderboard yet, response may be {} or null — depends on implementation.
+
+11) Test idempotency & repeated updates (important)
+
+If you call PUT /api/matches/result/MATCH_ID multiple times with same payload, leaderboard will be updated multiple times (current logic increments each call).
+
+Note/Recommendation: For production add an idempotency check: if match.result already exists and is same, skip updateLeaderboard() or reverse previous deltas before re-applying.
+
+12) Additional checks & debugging tips
+
+Token missing → 401. Add header Authorization: Bearer <token>.
+
+ObjectId cast errors → make sure IDs are exact 24-hex strings, no trailing newline or extra spaces.
+
+If players array still empty after joins: check that joinTournament code uses await autoScheduleMatch(tournament, userId) and that Match.findOne({ tournament: tournamentId, status: "upcoming" }) is the condition (otherwise new match created each join).
+
+To inspect DB directly: use MongoDB Compass or mongo shell to inspect matches and leaderboards collections.
+
+Server logs: watch terminal for exceptions during join or update result — often shows why players not added.
+
+Quick curl snippets (for copy/paste)
+
+Register:
+
+curl -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"username":"userA","email":"a@example.com","password":"123456","phone":"9000000001","freefireId":"FF_A"}'
+
+
+Join tournament:
+
+curl -X POST http://localhost:5000/api/tournaments/join \
+ -H "Content-Type: application/json" \
+ -H "Authorization: Bearer TOKEN_A" \
+ -d '{"tournamentId":"TOURNAMENT_ID"}'
+
+
+Get matches:
+
+curl -H "Authorization: Bearer TOKEN_A" http://localhost:5000/api/matches/TOURNAMENT_ID
+
+
+Update match result:
+
+curl -X PUT http://localhost:5000/api/matches/result/MATCH_ID \
+ -H "Content-Type: application/json" \
+ -H "Authorization: Bearer TOKEN_ADMIN" \
+ -d '{"winner":"PLAYER_A_ID","topPlayers":["PLAYER_A_ID","PLAYER_B_ID"],"status":"completed"}'
+
+
+Get leaderboard:
+
+curl -H "Authorization: Bearer TOKEN_A" http://localhost:5000/api/leaderboard/TOURNAMENT_ID
+
+Final notes & recommended improvements (for production)
+
+Make updateMatchResult idempotent (don’t double-credit leaderboard if result already set).
+
+Consider role-check middleware so only admins/tournament-organizers can set results.
+
+Add validation: when auto-adding players to matches, optionally ensure only registeredPlayers are added.
+
+If matches should have a max players per match (e.g., squad = 4 per squad), implement logic to split players across multiple matches or create new match when current reaches capacity.
+
+Agar aap chaho, abhi main aapke current DB responses (tournament, matches, leaderboard) dekh kar live-debug kar sakta hoon — lekin aap mujhe simply Postman se one example join response, one get matches response, aur one updateMatchResult response paste kar do, main turant bata dunga agar kuch logic galat hai ya duplicate updates ho rahe hain.
+
+
+
+
+
+                                     next day
+
+
+
+
+
+
+                                     Step 0 — Create test users (Admin + Players)
+
+Endpoint: POST http://localhost:5000/api/auth/register
+Headers: Content-Type: application/json
+Body (example):
+
+{
+  "username": "admin",
+  "email": "admin@example.com",
+  "password": "123456",
+  "freefireId": "ADMIN001"
+}
+
+
+Repeat for player1, player2, ... player16 (or as many as required).
+Expected: 201 JSON with token and _id. Save each token & id into Postman environment.
+
+If register returns token, you can use that. Or POST /api/auth/login to get token.
+
+FORMAT A — Free-for-All (Top 3 winners)
+
+Goal: create a tournament where many players (e.g. 50) register and final top 3 get prizes.
+
+A1 — Create Free-for-All tournament
+
+Endpoint: POST /api/tournaments/create
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Body example:
+
+{
+  "title": "FFA — 50 Players",
+  "entryFee": 10,
+  "maxPlayers": 50,
+  "type": "freeForAll",
+  "startTime": "2025-09-20T12:00:00.000Z",
+  "prizes": { "first": 5000, "second": 2000, "third": 1000 }
+}
+
+
+Expected: 201 with tournament object. Save TOURNAMENT_ID_FFA.
+
+A2 — Players join
+
+For each player:
+Endpoint: POST /api/tournaments/join
+Headers: Authorization: Bearer <PLAYER_TOKEN>
+Body:
+
+{ "tournamentId": "<TOURNAMENT_ID_FFA>" }
+
+
+Expected: 201 Joined successfully and entry object.
+
+Repeat until desired number of players registered.
+
+A3 — Produce final results (manual approach)
+
+Note: There’s no automatic match engine for FFA in current backend — so to set final top-3 you can either:
+
+Use the manual leaderboard update endpoint (recommended for testing), or
+
+Use matches & update results which will increment leaderboard.
+
+Manual update (directly set desired kills/points/wins):
+Endpoint: PUT /api/leaderboard/<TOURNAMENT_ID>/<PLAYER_ID>
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Body (example to set player stats):
+
+{ "kills": 11, "points": 55, "wins": 2 }
+
+
+Do this for top 3 players with the values you want (as you asked: “points jaise main marzi se dena”).
+
+A4 — Verify Top 3
+
+Endpoint: GET /api/leaderboard/<TOURNAMENT_ID>
+Headers: Authorization: Bearer <ANY_TOKEN>
+Expected: JSON array sorted by points, wins, kills (highest first). You should see the values you manually set.
+
+A5 — Mark tournament completed (optional)
+
+There is no dedicated update tournament API in current code. To mark tournament completed you can:
+
+update in DB directly (Mongo shell / Compass), or
+
+add a simple API PUT /api/tournaments/:id/complete (I can provide if needed).
+For testing you can rely on the leaderboard output to pick winners.
+
+FORMAT B — Team Battle (1v1, 2v2, 3v3, 4v4, 5v5)
+
+Goal: create team-sized tournaments where team wins the prize.
+
+B1 — Create Team Battle tournament
+
+Endpoint: POST /api/tournaments/create
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Body example for 2v2:
+
+{
+  "title": "2v2 Cup",
+  "entryFee": 20,
+  "maxPlayers": 32,         // total individual players (teams = maxPlayers/teamSize)
+  "type": "teamBattle",
+  "teamSize": 2,
+  "startTime": "2025-09-22T12:00:00.000Z",
+  "prizes": { "first": 8000 }
+}
+
+
+Save TOURNAMENT_ID_TEAM.
+
+B2 — Players join (individuals)
+
+Each player joins the tournament as before:
+Endpoint: POST /api/tournaments/join (player token).
+Note: Current backend stores registeredPlayers as individual user IDs — teams are built when creating matches manually.
+
+B3 — Create a match for teams (manual pairing)
+
+You must create matches manually (controller supports POST /api/matches/create). For team battles, pass teams array (array of arrays of user IDs).
+Endpoint: POST /api/matches/create
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Body example (one match, team A vs team B):
+
+{
+  "tournamentId": "<TOURNAMENT_ID_TEAM>",
+  "title": "Round 1 - Match 1",
+  "mode": "squad", // does not affect teams; keep as default
+  "scheduledTime": "2025-09-22T12:05:00.000Z",
+  "teams": [
+    ["<PLAYER1_ID>", "<PLAYER2_ID>"],   // Team A
+    ["<PLAYER3_ID>", "<PLAYER4_ID>"]    // Team B
+  ]
+}
+
+
+Expected: 201 match object with teams populated.
+
+B4 — Report match result (team win)
+
+Endpoint: PUT /api/matches/result/<MATCH_ID>
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Important: current updateMatchResult expects winner (user id) and topPlayers (array). For team wins, include the team members in topPlayers (and pick one team leader as winner if required). Example:
+
+{
+  "winner": "<PLAYER1_ID>",                      // representative of winning team
+  "topPlayers": ["<PLAYER1_ID>","<PLAYER2_ID>"],
+  "status": "completed"
+}
+
+
+Expected: 200 and match result updated; leaderboard will be updated for players in topPlayers.
+
+B5 — Continue tournament
+
+For brackets you can create subsequent matches manually using winners.
+
+Alternatively, build a helper script (or I can add auto bracket logic) to pair winners and create next round matches.
+
+B6 — Verify leaderboard & winners
+
+GET /api/leaderboard/<TOURNAMENT_ID> to see all players’ points.
+
+Determine the winning team by points/wins or by who advanced in matches.
+
+FORMAT C — Knockout / Elimination (Round → Quarter → Semi → Final)
+
+Goal: simulate full knockout bracket. Current backend does not auto-generate full bracket — you will manually create matches per round (I also show how to do it manually). I can add auto-bracket code later if you want.
+
+C1 — Create Knockout tournament
+
+Endpoint: POST /api/tournaments/create
+Headers: Authorization: Bearer <ADMIN_TOKEN>
+Body example (16 players, solo):
+
+{
+  "title": "Knockout 16",
+  "entryFee": 10,
+  "maxPlayers": 16,
+  "type": "knockout",
+  "teamSize": 1,
+  "startTime": "2025-09-25T12:00:00.000Z",
+  "prizes": { "first": 10000 }
+}
+
+
+Save TOURNAMENT_ID_KO.
+
+C2 — 16 players join (repeat join endpoint)
+
+Each player POST /api/tournaments/join with their token.
+
+C3 — Create Round-1 matches (manual)
+
+You need to pair players into 8 matches. Example create 8 matches using POST /api/matches/create — for each match players array should contain the two players (for 1v1). Example:
+
+{
+  "tournamentId": "<TOURNAMENT_ID_KO>",
+  "title": "Round1 - Match 1",
+  "scheduledTime": "2025-09-25T12:05:00.000Z",
+  "players": ["<P1_ID>", "<P2_ID>"],
+  "round": "round1"
+}
+
+
+Repeat for all 8 matches (Match1..Match8). Save all MATCH_IDs.
+
+C4 — Report results for each match
+
+For each Round1 match:
+Endpoint: PUT /api/matches/result/<MATCH_ID>
+Body:
+
+{
+  "winner": "<winner_player_id>",
+  "topPlayers": ["<winner_player_id>"],
+  "status": "completed"
+}
+
+
+Important: Do NOT call the same result repeatedly (leaderboard increments every call).
+
+C5 — Create Quarterfinals from winners
+
+Collect the 8 winners from Round1 and pair them into 4 quarterfinal matches. Use POST /api/matches/create with round: "quarter" and players set to the paired winners.
+
+Example:
+
+{
+  "tournamentId": "<TOURNAMENT_ID_KO>",
+  "title": "Quarter - Match 1",
+  "scheduledTime": "2025-09-25T13:00:00.000Z",
+  "players": ["<W1>", "<W2>"],
+  "round": "quarter"
+}
+
+C6 — Repeat: report quarterfinal winners → create semis → report semis → create final → report final
+
+Continue the same steps until final. The final winner is tournament champion.
+
+C7 — Verify & prize
+
+GET /api/matches/<tournamentId> or GET /api/tournaments/:id/matches to see all matches and who advanced.
+
+GET /api/leaderboard/<tournamentId> to view aggregated points/wins (if you used leaderboard updates).
+
+To award prize: currently manual — you can note the final winner and carry out payouts outside (or I can add a payout API later).
+
+Useful POSTMAN example snippets (quick copy-paste)
+
+Create match (generic)
+POST /api/matches/create
+Body:
+
+{
+  "tournamentId": "TOURNAMENT_ID",
+  "title": "Round1 - Match1",
+  "scheduledTime": "2025-09-25T12:00:00.000Z",
+  "players": ["P1","P2"],
+  "teams": [["P1","P2"],["P3","P4"]] // optional for team battle
+}
+
+
+Report result
+PUT /api/matches/result/MATCH_ID
+Body:
+
+{
+  "winner": "PLAYER_ID_AS_REPRESENTATIVE",
+  "topPlayers": ["PLAYER_ID_1","PLAYER_ID_2"],
+  "status": "completed"
+}
+
+
+Manual leaderboard override
+PUT /api/leaderboard/TOURNAMENT_ID/PLAYER_ID
+Body:
+
+{ "kills": 11, "points": 55, "wins": 2 }
+
+Debugging tips & gotchas
+
+Authorization: Always include Authorization: Bearer <token>. Missing token → 401.
+
+ObjectId errors: Copy IDs exactly (24 hex chars), no trailing newline/spaces.
+
+Leaderboard increments: updateMatchResult increments leaderboard — avoid calling it multiple times with the same result (will double count). Use manualUpdateLeaderboard if you want to set absolute values.
+
+Team winners: backend expects winner as a userId; for team wins include team member IDs in topPlayers to award points to each team member.
+
+Automatic bracket generation is not yet implemented — I gave manual steps to create round matches. If you want, I can add POST /tournaments/:id/start that auto-generates the bracket and creates all Round1 matches by pairing registered players (say random shuffle). Tell me and I’ll code it next.
+
+Prize payouts are not automated in current backend — payout system can be added later.
+
+Quick validation checklist (after you run tests)
+
+For each join call you should get 201 and entry.
+
+After creating matches, GET /api/matches/<tournamentId> should list them.
+
+After reporting results for matches, those match objects should show status: completed and result field.
+
+GET /api/leaderboard/<tournamentId> should reflect updated points/wins/kills (either auto via match result or manual override).
+
+If you want, I can now:
+
+(A) Provide a Postman collection JSON (importable) with the exact requests and placeholders for IDs/tokens — so you can click and run.
+
+(B) Implement the start tournament endpoint that auto-generates Round-1 bracket (random pairing) for Knockout and optionally auto-split teams for Team Battle.
+
+Kaunsa next step chahiye — Postman collection (A) ya auto-start endpoint code (B)?

@@ -1,0 +1,27 @@
+.wallet-page {
+  padding: 20px;
+  text-align: center;
+}
+
+.wallet-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.wallet-btn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.wallet-btn:hover {
+  background: #1e7e34;
+}

@@ -1,0 +1,138 @@
+Tournament create → ✅
+
+Tournament join (players add) → ✅
+
+Match schedule → ✅
+
+Match result update → ✅
+
+
+
+✅ Backend me ab tak jo bana chuka hai
+1. Authentication & User Management
+
+JWT based authentication ready hai (login, register, protect middleware).
+
+req.user se user _id har API me access ho raha hai.
+
+Users ka basic info (username, email) populate ho raha hai.
+
+2. Tournament System
+
+Create Tournament API ✅
+
+Get All Tournaments API ✅
+
+Get Tournament by ID API ✅
+
+Tournament me maxPlayers, registeredPlayers etc. handle ho raha hai.
+
+User tournament join kar sakta hai with:
+
+Entry create hota hai (Entry model).
+
+Tournament ke registeredPlayers update hote hain.
+
+✅ Auto match scheduling logic added (join pe player automatically ek match me assign ho jata hai).
+
+3. Matches
+
+Match model bana hua hai.
+
+Join karte hi match auto-create / update hota hai.
+
+Match ke liye abhi basic title, mode, scheduledTime, players ka setup hai.
+
+Match result update endpoint ban chuka hai (PUT /matches/result/:matchId).
+
+Isse leaderboard automatically update hota hai (default rules: +10 win, +5 point +1 kill for top players).
+
+4. Leaderboard
+
+Leaderboard model ready hai.
+
+Auto-update logic matches ke result ke saath integrated hai.
+
+Get Leaderboard API ✅ (tournament wise, sorted by points/wins/kills).
+
+Get My Performance API ✅ (user specific).
+
+Manual Update API ✅ (PUT /leaderboard/:tournamentId/:playerId → custom kills, points, wins dalne ka option).
+
+🚧 Abhi bacha hua / pending work
+
+Role-based Access Control (RBAC)
+
+Abhi har authenticated user leaderboard update kar sakta hai.
+
+Ideally: manualUpdateLeaderboard sirf admin role ke liye allow hona chahiye.
+
+Match Result Flow
+
+Currently PUT /matches/result/:id se manually result dalte ho.
+
+Agar aapko realistic e-sports system banana hai to:
+
+Either external game API integration (automatic kills/wins).
+
+Ya admin panel se manual entry dalna.
+
+Payment Integration
+
+Tournament entry me abhi paymentStatus: completed hardcoded hai.
+
+Future me real payment gateway (Razorpay/Stripe) integrate karna padega.
+
+Validation & Error Handling
+
+Tournament join karte time validation hai, but:
+
+Match me scheduling logic ko aur expand karna hoga (multiple matches, brackets).
+
+Currently sirf ek match create ho raha hai per tournament.
+
+Notifications / Real-time Updates
+
+Abhi API sirf REST hai.
+
+Real-time leaderboard updates, match start time notifications ke liye WebSocket/Socket.io chahiye hoga.
+
+Frontend Integration
+
+Backend APIs ready ho rahe hain, but abhi frontend side (React) se test aur connect karna pending hai.
+
+🏁 Summary in Simple Words
+
+Auth ✅
+
+Tournament CRUD + Join + Auto Scheduling ✅
+
+Matches (basic + result update) ✅
+
+Leaderboard (auto + manual update + get) ✅
+
+👉 Pending major work:
+
+Admin-only update permissions
+
+Real payments
+
+Multi-match / bracket scheduling
+
+Real-time updates (Socket.io)
+
+Proper frontend connection
+
+Vikas bhai, aap chahte ho mai next step ke liye roadmap bana du (jaise abhi backend me priority kya ho: RBAC → Payments → Socket.io)? 
+
+
+
+✅ Auth (register/login)
+
+✅ Tournament creation + joining
+
+✅ Matches create/update + result
+
+✅ Leaderboard (auto + manual update)
+
+✅ 3 types of tournament formats tested successfully

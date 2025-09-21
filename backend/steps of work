@@ -1,0 +1,28 @@
+Auto-status update:
+Agar match ka scheduledTime khatam ho jaye to status automatically completed ho jaye (cron job / scheduler se).
+
+Leaderboard system:
+
+Matches ke results se ek leaderboard generate karo.
+
+Har player ke total kills / rank points store karo.
+
+Frontend integration (React app):
+
+Tournament list + Join button
+
+My Matches (user-specific)
+
+Match Details + Result
+
+
+
+
+
+🛠 Naye Files jo banani hain (sirf leaderboard feature ke liye):
+
+models/leaderboardModel.js – leaderboard schema.
+
+controllers/leaderboardController.js – leaderboard CRUD logic.
+
+routes/leaderboardRoutes.js – leaderboard ke endpoints.

@@ -1,0 +1,21 @@
+📝 Explanation
+
+title → tournament ka naam (e.g., "Free Fire Clash #1").
+
+game → by default "Free Fire", but future me multi-game support ke liye option.
+
+entryFee → har player ko kitna paisa dena hoga register karne ke liye.
+
+prize → jeetne wale ko jo paisa milega.
+
+maxPlayers → maximum players jo participate kar sakte hai.
+
+registeredPlayers → array of User IDs jo join karenge tournament.
+
+status → upcoming, ongoing, completed.
+
+startTime → kab start hoga.
+
+createdBy → kis user (admin/host) ne tournament banaya.
+
+timestamps → createdAt and updatedAt automatically add ho jayenge.
